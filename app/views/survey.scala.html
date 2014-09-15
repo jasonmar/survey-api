@@ -1,0 +1,29 @@
+@import models.SurveyModel.Survey
+@(form: Form[Survey], orgs: Option[List[Survey]])
+
+@tr(s: String) = {
+  <tr><td>@s</td></tr>
+}
+
+@main("Welcome to Play") {
+
+    @helper.form(action = routes.Surveys.post()) {
+        @helper.inputText(form("name"),'_label -> "Survey Name")
+    }
+
+    @orgs match {
+        case Some(list) => {
+<table>
+  <tr><td>Survey Name</td></tr>
+            @for(item <- list) {
+                @tr(item.name)
+            }
+</table>
+        }
+        case None => {
+            <p>No Surveys found</p>
+        }
+    }
+
+
+}
