@@ -1,0 +1,44 @@
+@import models.QuestionModel.Question
+@(form: Form[Question], orgs: Option[List[Question]])
+
+@tr(s: String, s1: String, s2: String, s3: String) = {
+  <tr>
+    <td>@s</td>
+    <td>@s1</td>
+    <td>@s2</td>
+    <td>@s3</td>
+  </tr>
+}
+
+@main("Welcome to Play") {
+
+    @helper.form(action = routes.Questions.post()) {
+        @helper.inputText(form("text"),'_label -> "Question Text")
+        @helper.inputText(form("hint1"),'_label -> "Hint 1")
+        @helper.inputText(form("hint3"),'_label -> "Hint 3")
+        @helper.inputText(form("hint5"),'_label -> "Hint 5")
+        <input type="submit">Submit Question</input>
+    }
+
+
+    @orgs match {
+        case Some(list) => {
+<table>
+  <tr>
+    <td>Question Text</td>
+    <td>Hint 1</td>
+    <td>Hint 3</td>
+    <td>Hint 5</td>
+  </tr>
+            @for(item <- list) {
+                @tr(item.text,item.hint1,item.hint3,item.hint5)
+            }
+</table>
+        }
+        case None => {
+            <p>No Questions found</p>
+        }
+    }
+
+
+}
