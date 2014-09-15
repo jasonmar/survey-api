@@ -1,0 +1,29 @@
+@import models.OrgModel.Org
+@(form: Form[Org], orgs: Option[List[Org]])
+
+@tr(s: String) = {
+  <tr><td>@s</td></tr>
+}
+
+@main("Welcome to Play") {
+
+    @helper.form(action = routes.Orgs.post()) {
+        @helper.inputText(form("name"),'_label -> "Org Name")
+    }
+
+    @orgs match {
+        case Some(list) => {
+<table>
+  <tr><td>Org Name</td></tr>
+            @for(org <- list) {
+                @tr(org.name)
+            }
+</table>
+        }
+        case None => {
+            <p>No orgs found</p>
+        }
+    }
+
+
+}
