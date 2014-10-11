@@ -20,8 +20,8 @@ object Orgs extends Controller {
   }
 
   def json = Action {
-    val orgs = selectAll
-    orgs match {
+    val data = selectAll
+    data match {
       case Some(list) => Ok(Json.toJson(list).toString())
       case _ => Ok
     }

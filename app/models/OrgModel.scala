@@ -13,7 +13,7 @@ object OrgModel {
   case class Org(name: String) {
     def insert(): Option[Long] = {
       val id: Option[Long] = DB.withConnection {
-        implicit c =>
+        implicit connection =>
           SQL("INSERT INTO ORGS (NAME) values ({name})")
             .on("name" -> name)
             .executeInsert()

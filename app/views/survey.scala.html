@@ -1,8 +1,11 @@
-@import models.SurveyModel.Survey
-@(form: Form[Survey], orgs: Option[List[Survey]])
+@import models.SurveyModel._
+@(form: Form[Survey], orgs: Option[List[SurveyRecord]])
 
-@tr(s: String) = {
-  <tr><td>@s</td></tr>
+@tr(id: Long, s: String) = {
+  <tr>
+    <td>@id.toString</td>
+    <td>@s</td>
+  </tr>
 }
 
 @main("Welcome to Play") {
@@ -14,9 +17,12 @@
     @orgs match {
         case Some(list) => {
 <table>
-  <tr><td>Survey Name</td></tr>
+  <tr>
+    <td>Survey ID</td>
+    <td>Survey Name</td>
+  </tr>
             @for(item <- list) {
-                @tr(item.name)
+                @tr(item.id, item.name)
             }
 </table>
         }

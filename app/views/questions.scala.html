@@ -1,8 +1,9 @@
-@import models.QuestionModel.Question
-@(form: Form[Question], orgs: Option[List[Question]])
+@import models.QuestionModel.{Question,QuestionRecord}
+@(form: Form[Question], questions: Option[List[QuestionRecord]])
 
-@tr(s: String, s1: String, s2: String, s3: String) = {
+@tr(id: Long, s: String, s1: String, s2: String, s3: String) = {
   <tr>
+    <td>@id.toString</td>
     <td>@s</td>
     <td>@s1</td>
     <td>@s2</td>
@@ -21,17 +22,18 @@
     }
 
 
-    @orgs match {
+    @questions match {
         case Some(list) => {
 <table>
   <tr>
+    <td>Question ID</td>
     <td>Question Text</td>
     <td>Hint 1</td>
     <td>Hint 3</td>
     <td>Hint 5</td>
   </tr>
             @for(item <- list) {
-                @tr(item.text,item.hint1,item.hint3,item.hint5)
+                @tr(item.q_id,item.question.text,item.question.hint1,item.question.hint3,item.question.hint5)
             }
 </table>
         }

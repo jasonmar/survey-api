@@ -1,0 +1,35 @@
+@import models.ResponseModel.ResponseRecord
+@(responses: Option[List[ResponseRecord]])
+
+@tr(s: String, s1: String, s2: String, s3: String) = {
+  <tr>
+    <td>@s</td>
+    <td>@s1</td>
+    <td>@s2</td>
+    <td>@s3</td>
+  </tr>
+}
+
+@main("Welcome to Play") {
+
+    @responses match {
+        case Some(list) => {
+<table>
+  <tr>
+    <td>Survey ID</td>
+    <td>Question ID</td>
+    <td>User ID</td>
+    <td>RESPONSE</td>
+  </tr>
+            @for(item <- list) {
+                @tr(item.s_id.toString, item.q_id.toString, item.u_id.toString, item.response.toString)
+            }
+</table>
+        }
+        case None => {
+            <p>No Responses found</p>
+        }
+    }
+
+
+}

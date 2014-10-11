@@ -1,22 +1,24 @@
 package controllers
 
+import models.SurveyUpdateModel.{SurveyQuestions,addSurveyQuestions}
 import play.api._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsError, Json}
 import play.api.mvc._
 import models.SurveyModel._
 
 object Surveys extends Controller {
 
   def get = Action {
-    val items: Option[List[Survey]] = selectAll
+    val items: Option[List[SurveyRecord]] = selectAll
     Ok(views.html.survey(surveyForm, items))
   }
 
   def post = Action {
     implicit request =>
-      val data = surveyForm.bindFromRequest.get
-      data.insert()
-      Ok(Json.toJson(data).toString())
+      val survey = surveyForm.bindFromRequest.get
+      insertSurvey(survey)
+      //Redirect(routes.Surveys.json())
+      Ok("'" + survey.name + "' inserted")
   }
 
   def json = Action {
@@ -27,12 +29,40 @@ object Surveys extends Controller {
     }
   }
 
-  def put = Action {
-    Ok(views.html.index("Your new application is ready."))
+  def getSurveyById(id: Long) = Action {
+    getFullSurvey(id) match {
+      case Some(x) => Ok(Json.toJson(x).toString())
+      case _ => NotFound("Survey with id " + id.toString + " not found")
+    }
   }
 
-  def delete = Action {
-    Ok(views.html.index("Your new application is ready."))
+  /**
+   * Example insert script
+   *
+   * curl --include --request POST --header "Content-type: application/json" \
+   * --data '{"s_id":1, "q_ids":[1,2,3]}' http://localhost:9000/v1/surveys/1
+   *
+   */
+
+  def addQuestionsToSurvey(id: Long) = Action(BodyParsers.parse.json) {request =>
+    val result = request.body.validate[SurveyQuestions]
+    result.fold(
+      errors =>
+        BadRequest(
+          Json.obj(
+            "status"  -> "KO"
+            ,"message" -> JsError.toFlatJson(errors))
+        )
+      ,surveyQuestions => {
+        addSurveyQuestions(surveyQuestions)
+        Ok(
+          Json.obj(
+            "status"  -> "OK"
+            ,"message" -> (surveyQuestions.q_ids.length.toString + " questions for s_id " + surveyQuestions.s_id + " added.")
+          )
+        )
+      }
+    )
   }
 
 }
