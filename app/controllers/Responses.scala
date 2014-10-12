@@ -1,10 +1,12 @@
 package controllers
 
+import models.IdGenerator
 import play.api._
 import play.api.mvc._
 import play.api.libs.json._
 import models.ResponseModel._
 import models.CacheModel.actionCounter
+import models.UserModel._
 
 object Responses extends Controller {
 
@@ -12,6 +14,8 @@ object Responses extends Controller {
     val items: Option[List[ResponseRecord]] = getResponses
     Ok(views.html.responses(items))
   }
+
+
 
   /**
    *  Test script:
@@ -28,6 +32,12 @@ object Responses extends Controller {
    *  http://localhost:9000/v1/responses
    */
   def post = Action(BodyParsers.parse.json) {request =>
+
+    val u_id: String = request.headers.get("u_id") match {
+      case Some(x) => x
+      case _ => getUidForIp(request.remoteAddress)
+    }
+
     if (actionCounter(request.remoteAddress, "postResponse") > 5) {
       TooManyRequest("Too many requests")
     } else {
@@ -40,7 +50,7 @@ object Responses extends Controller {
               ,"message" -> JsError.toFlatJson(errors))
           )
         ,responses => {
-          saveResponses(responses)
+          saveResponses(responses, u_id)
           Ok(
             Json.obj(
               "status"  -> "OK"

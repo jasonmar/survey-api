@@ -32,10 +32,10 @@ object Surveys extends Controller {
     }
   }
 
-  def getSurveyById(id: String) = Action {
-    getFullSurvey(id) match {
+  def getSurveyById(s_id: String) = Action {
+    getFullSurvey(s_id) match {
       case Some(x) => Ok(Json.toJson(x).toString())
-      case _ => NotFound("Survey with id " + id.toString + " not found")
+      case _ => NotFound("Survey with id " + s_id.toString + " not found")
     }
   }
 

@@ -12,7 +12,7 @@ import play.api.libs.functional.syntax._
 
 object SurveyModel {
 
-  case class SurveyRecord(id: String, name: String)
+  case class SurveyRecord(s_id: String, name: String)
   case class Survey(name: String)
   case class FullSurvey(id: String, name: String, questions: List[QuestionRecord])
 
@@ -53,14 +53,14 @@ object SurveyModel {
   )
 
   implicit val fullSurveyWrites: Writes[FullSurvey] = (
-    (JsPath \ "id").write[String] and
+    (JsPath \ "s_id").write[String] and
     (JsPath \ "name").write[String] and
     (JsPath \ "questions").write[List[QuestionRecord]]
   )(unlift(FullSurvey.unapply))
 
   implicit val surveyRecordWrites = new Writes[SurveyRecord] {
     def writes(survey: SurveyRecord) = Json.obj(
-       "id" -> survey.id
+       "s_id" -> survey.s_id
       ,"name" -> survey.name
     )
   }
@@ -69,7 +69,7 @@ object SurveyModel {
 
   private val surveyRecordRowParser = {
     get[String]("S_ID") ~
-    get[String]("name") map {
+    get[String]("NAME") map {
       case a~b => SurveyRecord(a,b)
     }
   }

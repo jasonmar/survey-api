@@ -6,12 +6,10 @@ import play.api.db.DB
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{Json, Writes, JsPath, Reads}
 import play.api.Play.current
-import play.api.data.Form
-import play.api.data.Forms._
 import org.joda.time._
-import org.joda.time.format._
 import models.AnormExtension._
 import models.DateUtil.d2s
+
 object ResponseModel {
 
   case class Response(q_id: String, response: Int) { require(response >= 0 && response <= 5) }
@@ -33,27 +31,23 @@ object ResponseModel {
       "surveyId" -> x.s_id
       ,"questionId" -> x.q_id
       //,"userId" -> x.u_id
-      ,"responseId" -> x.response
+      ,"response" -> x.response
       ,"timestamp" -> d2s(x.timestamp)
     )
   }
 
-  def saveResponses(r: Responses): Unit = {
+  def saveResponses(r: Responses, u_id: String): Unit = {
     // TODO verify that S_ID and Q_ID actually exist
     // TODO collect User ID
     r.responses.foreach{response =>
-      //response.response match {
-        //case x if x <= 5 || x >= 0 =>
-          DB.withConnection {implicit connection =>
-            SQL("""INSERT INTO RESPONSES (S_ID,Q_ID,U_ID,RESPONSE) values ({S_ID},{Q_ID},{U_ID},{RESPONSE})""")
-              .on("S_ID"     -> r.s_id)
-              .on("Q_ID"     -> response.q_id)
-              .on("U_ID"     -> 1)
-              .on("RESPONSE" -> response.response)
-              .executeInsert()
-          }
-        //case _ =>
-      //}
+      DB.withConnection {implicit connection =>
+        SQL("""INSERT INTO RESPONSES (S_ID,Q_ID,U_ID,RESPONSE) values ({S_ID},{Q_ID},{U_ID},{RESPONSE})""")
+          .on("S_ID"     -> r.s_id)
+          .on("Q_ID"     -> response.q_id)
+          .on("U_ID"     -> u_id)
+          .on("RESPONSE" -> response.response)
+          .executeInsert()
+      }
     }
   }
 
@@ -69,7 +63,7 @@ object ResponseModel {
 
   def getResponses = {
     val list: List[ResponseRecord] = DB.withConnection{implicit connection =>
-      SQL("""SELECT S_ID, Q_ID, U_ID, RESPONSE, TIMESTAMP FROM RESPONSES;""").as(rowParser *)
+      SQL("""SELECT TOP 5000 S_ID, Q_ID, U_ID, RESPONSE, TIMESTAMP FROM RESPONSES;""").as(rowParser *)
     }
     list match {
       case x if x.nonEmpty => Some(x)

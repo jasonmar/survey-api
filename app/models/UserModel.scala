@@ -8,6 +8,7 @@ import play.api.data.Forms._
 import play.api.db.DB
 import play.api.Play.current
 import models.IdGenerator
+import play.api.mvc.Request
 
 object UserModel {
 
@@ -74,6 +75,24 @@ object UserModel {
     }
   }
 
+  /**  For anonymous users, we use their IP as a userId
+    *  This function looks up an existing u_id or creates a new one if this is a new IP
+    */
+  def getUidForIp(a: String): String = {
+    getHashed(a) match {
+      case Some(x) => x.u_id
+      case _ =>
+        val u_id = IdGenerator.newUser
+        DB.withConnection {implicit connection =>
+        SQL("""INSERT INTO SECURITY (U_ID, HASHED, ID) values ({U_ID}, {HASHED}, {ID})""")
+          .on("U_ID"   -> u_id)
+          .on("HASHED" -> "")
+          .on("ID"     -> u_id)
+          .executeInsert()
+        }
+        u_id
+    }
+  }
 
 
 }
