@@ -10,13 +10,14 @@ import play.api.Play.current
 
 object QuestionModel {
 
-  case class QuestionRecord(q_id: Long, question: Question)
+  case class QuestionRecord(q_id: String = IdGenerator.newQuestion, question: Question)
   case class Question(text: String, hint1: String, hint3: String, hint5: String)
 
   def insertQuestion(q: Question): Unit = {
     DB.withConnection {
       implicit connection =>
-        SQL("INSERT INTO QUESTIONS (TEXT,HINT1,HINT3,HINT5) values ({text},{hint1},{hint3},{hint5})")
+        SQL("INSERT INTO QUESTIONS (Q_ID,TEXT,HINT1,HINT3,HINT5) values ({q_id},{text},{hint1},{hint3},{hint5})")
+          .on("q_id"  -> IdGenerator.newQuestion)
           .on("text"  -> q.text)
           .on("hint1" -> q.hint1)
           .on("hint3" -> q.hint3)
@@ -27,7 +28,7 @@ object QuestionModel {
 
   val questionForm = Form(
     mapping(
-      "text" -> text
+       "text"  -> text
       ,"hint1" -> text
       ,"hint3" -> text
       ,"hint5" -> text
@@ -36,7 +37,7 @@ object QuestionModel {
 
   implicit val questionWrites = new Writes[Question] {
     def writes(x: Question) = Json.obj(
-      "text" -> x.text
+       "text"  -> x.text
       ,"hint1" -> x.hint1
       ,"hint3" -> x.hint3
       ,"hint5" -> x.hint5
@@ -45,18 +46,16 @@ object QuestionModel {
 
   implicit val questionRecordWrites = new Writes[QuestionRecord] {
     def writes(x: QuestionRecord) = Json.obj(
-      "q_id" -> x.q_id
-      ,"text" -> x.question.text
+       "q_id"  -> x.q_id
+      ,"text"  -> x.question.text
       ,"hint1" -> x.question.hint1
       ,"hint3" -> x.question.hint3
       ,"hint5" -> x.question.hint5
     )
   }
 
-  private val selectAllQ = SQL("""SELECT Q_ID,TEXT,HINT1,HINT3,HINT5 FROM QUESTIONS;""")
-
   private val questionRowParser = {
-    get[Long]("q_id") ~
+    get[String]("q_id") ~
     get[String]("text") ~
     get[String]("hint1") ~
     get[String]("hint3") ~
@@ -67,7 +66,8 @@ object QuestionModel {
 
   def getQuestions = {
     val list: List[QuestionRecord] = DB.withConnection{implicit connection =>
-      selectAllQ.as(questionRowParser *)
+      SQL("""SELECT Q_ID,TEXT,HINT1,HINT3,HINT5 FROM QUESTIONS;""")
+        .as(questionRowParser *)
     }
     list match {
       case x if x.nonEmpty => Some(x)
@@ -75,8 +75,8 @@ object QuestionModel {
     }
   }
 
-  def getQuestionsBySurveyID(surveyId: Long): Option[List[QuestionRecord]] = {
-    DB.withConnection{implicit connection =>
+  def getQuestionsBySurveyID(surveyId: String): Option[List[QuestionRecord]] = {
+    val list: List[QuestionRecord] = DB.withConnection{implicit connection =>
       SQL("""
 SELECT A.Q_ID,TEXT,HINT1,HINT3,HINT5
 FROM QUESTIONS A
@@ -87,7 +87,8 @@ WHERE B.S_ID = {S_ID}
       )
         .on("S_ID" -> surveyId)
         .as(questionRowParser *)
-    } match {
+    }
+    list match {
       case x if x.nonEmpty => Some(x)
       case _ => None
     }

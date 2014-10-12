@@ -1,9 +1,9 @@
 @import models.QuestionModel.{Question,QuestionRecord}
 @(form: Form[Question], questions: Option[List[QuestionRecord]])
 
-@tr(id: Long, s: String, s1: String, s2: String, s3: String) = {
+@tr(id: String, s: String, s1: String, s2: String, s3: String) = {
   <tr>
-    <td>@id.toString</td>
+    <td>@id</td>
     <td>@s</td>
     <td>@s1</td>
     <td>@s2</td>

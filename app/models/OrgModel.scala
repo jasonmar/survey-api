@@ -10,15 +10,15 @@ import play.api.libs.json.{Json, Writes}
 
 object OrgModel {
 
-  case class Org(name: String) {
-    def insert(): Option[Long] = {
-      val id: Option[Long] = DB.withConnection {
-        implicit connection =>
-          SQL("INSERT INTO ORGS (NAME) values ({name})")
-            .on("name" -> name)
-            .executeInsert()
-      }
-      id
+  case class Org(name: String)
+  case class OrgRecord(name: String, org_id: String = IdGenerator.newOrg)
+
+  def insertOrg(org: Org): Option[Long] = {
+    DB.withConnection {implicit connection =>
+      SQL("INSERT INTO ORGS (O_ID, NAME) values ({o_id}, {name})")
+        .on("o_id" -> IdGenerator.newOrg)
+        .on("name" -> org.name)
+        .executeInsert()
     }
   }
 
@@ -34,17 +34,16 @@ object OrgModel {
     )
   }
 
-  val selectAllQ = SQL("""SELECT O_ID,NAME FROM ORGS;""")
-
-  val org = {
+  val orgRowParser = {
     get[String]("name") map {
-      case name => Org(name)
+      case name => Org(name = name)
     }
   }
 
-  def selectAll = {
+  def getOrgs = {
     val orgs: List[Org] = DB.withConnection{implicit connection =>
-      selectAllQ.as(org *)
+      SQL("""SELECT O_ID, NAME FROM ORGS;""")
+        .as(orgRowParser *)
     }
     orgs match {
       case x if x.nonEmpty => Some(x)

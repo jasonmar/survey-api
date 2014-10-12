@@ -1,10 +1,11 @@
 package controllers
 
-import models.SurveyUpdateModel.{SurveyQuestions,addSurveyQuestions}
 import play.api._
 import play.api.libs.json.{JsError, Json}
 import play.api.mvc._
 import models.SurveyModel._
+import models.SurveyUpdateModel.{SurveyQuestions,addSurveyQuestions}
+import models.CacheModel.actionCounter
 
 object Surveys extends Controller {
 
@@ -13,12 +14,14 @@ object Surveys extends Controller {
     Ok(views.html.survey(surveyForm, items))
   }
 
-  def post = Action {
-    implicit request =>
-      val survey = surveyForm.bindFromRequest.get
-      insertSurvey(survey)
-      //Redirect(routes.Surveys.json())
-      Ok("'" + survey.name + "' inserted")
+  def post = Action {implicit request =>
+      if(actionCounter(request.remoteAddress,"addSurvey") > 5) {
+        TooManyRequest("Too many requests")
+      } else {
+        val survey = surveyForm.bindFromRequest.get
+        insertSurvey(survey)
+        Ok("'" + survey.name + "' inserted")
+      }
   }
 
   def json = Action {
@@ -29,7 +32,7 @@ object Surveys extends Controller {
     }
   }
 
-  def getSurveyById(id: Long) = Action {
+  def getSurveyById(id: String) = Action {
     getFullSurvey(id) match {
       case Some(x) => Ok(Json.toJson(x).toString())
       case _ => NotFound("Survey with id " + id.toString + " not found")
@@ -40,11 +43,19 @@ object Surveys extends Controller {
    * Example insert script
    *
    * curl --include --request POST --header "Content-type: application/json" \
-   * --data '{"s_id":1, "q_ids":[1,2,3]}' http://localhost:9000/v1/surveys/1
+   * --data '{
+   * "s_id" : "srv_g6NFlzCY8R9O0gBUmiQQpmje"
+   * ,"q_ids":[
+   * "qst_ZsNz8lFmjmFQL4NEhUdbgqBh"
+   * ,"qst_TFqVM5ht6HPzrsE7NemNzH9T"
+   * ,"qst_i5qafjyTFFKwfL8VETSVx0mQ"
+   * ]
+   * }' \
+   * http://localhost:9000/v1/surveys/srv_g6NFlzCY8R9O0gBUmiQQpmje
    *
    */
 
-  def addQuestionsToSurvey(id: Long) = Action(BodyParsers.parse.json) {request =>
+  def addQuestionsToSurvey(id: String) = Action(BodyParsers.parse.json) {request =>
     val result = request.body.validate[SurveyQuestions]
     result.fold(
       errors =>

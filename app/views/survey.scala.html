@@ -1,9 +1,9 @@
 @import models.SurveyModel._
 @(form: Form[Survey], orgs: Option[List[SurveyRecord]])
 
-@tr(id: Long, s: String) = {
+@tr(id: String, s: String) = {
   <tr>
-    <td>@id.toString</td>
+    <td>@id</td>
     <td>@s</td>
   </tr>
 }

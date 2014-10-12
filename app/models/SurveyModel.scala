@@ -12,21 +12,22 @@ import play.api.libs.functional.syntax._
 
 object SurveyModel {
 
-  case class SurveyRecord(id: Long, name: String)
+  case class SurveyRecord(id: String, name: String)
   case class Survey(name: String)
-  case class FullSurvey(id: Long, name: String, questions: List[QuestionRecord])
+  case class FullSurvey(id: String, name: String, questions: List[QuestionRecord])
 
   def insertSurvey(x: Survey): Unit = {
     DB.withConnection {implicit connection =>
-      SQL("INSERT INTO SURVEYS (NAME) values ({name})")
+      SQL("INSERT INTO SURVEYS (S_ID, NAME) values ({s_id},{name})")
+        .on("s_id" -> IdGenerator.newSurvey)
         .on("name" -> x.name)
         .executeInsert()
     }
   }
 
-  def getSurveyName(id: Long): Option[String] = {
+  def getSurveyName(id: String): Option[String] = {
     val surveyRecords = DB.withConnection{implicit connection =>
-      SQL("""SELECT S_ID,NAME FROM SURVEYS WHERE S_ID = {S_ID} LIMIT 1;""")
+      SQL("""SELECT S_ID, NAME FROM SURVEYS WHERE S_ID = {S_ID} LIMIT 1;""")
         .on("S_ID" -> id)
         .as(surveyRecordRowParser *)
     }
@@ -36,7 +37,7 @@ object SurveyModel {
     }
   }
 
-  def getFullSurvey(id: Long): Option[FullSurvey] = {
+  def getFullSurvey(id: String): Option[FullSurvey] = {
     val name = getSurveyName(id)
     val questions = QuestionModel.getQuestionsBySurveyID(id)
     (name,questions) match {
@@ -52,7 +53,7 @@ object SurveyModel {
   )
 
   implicit val fullSurveyWrites: Writes[FullSurvey] = (
-    (JsPath \ "id").write[Long] and
+    (JsPath \ "id").write[String] and
     (JsPath \ "name").write[String] and
     (JsPath \ "questions").write[List[QuestionRecord]]
   )(unlift(FullSurvey.unapply))
@@ -67,7 +68,7 @@ object SurveyModel {
   val selectAllSurveysQuery = SQL("""SELECT S_ID,NAME FROM SURVEYS;""")
 
   private val surveyRecordRowParser = {
-    get[Long]("S_ID") ~
+    get[String]("S_ID") ~
     get[String]("name") map {
       case a~b => SurveyRecord(a,b)
     }

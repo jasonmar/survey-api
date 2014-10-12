@@ -8,19 +8,19 @@ import models.OrgModel._
 object Orgs extends Controller {
 
   def get = Action {
-    val orgs: Option[List[Org]] = selectAll
+    val orgs: Option[List[Org]] = getOrgs
     Ok(views.html.org(orgForm, orgs))
   }
 
   def post = Action {
     implicit request =>
-      val orgData = orgForm.bindFromRequest.get
-      orgData.insert()
-      Ok(Json.toJson(orgData).toString())
+      val org = orgForm.bindFromRequest.get
+      insertOrg(org)
+      Ok("Organization '" + org.name +"' inserted")
   }
 
   def json = Action {
-    val data = selectAll
+    val data = getOrgs
     data match {
       case Some(list) => Ok(Json.toJson(list).toString())
       case _ => Ok

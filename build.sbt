@@ -12,3 +12,7 @@ libraryDependencies ++= Seq(
   cache,
   ws
 )
+
+libraryDependencies += "org.mindrot" % "jbcrypt" % "0.3m"
+
+
