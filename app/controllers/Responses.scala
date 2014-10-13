@@ -1,11 +1,10 @@
 package controllers
 
-import models.IdGenerator
 import play.api._
 import play.api.mvc._
 import play.api.libs.json._
 import models.ResponseModel._
-import models.CacheModel.actionCounter
+import models.CacheModel._
 import models.UserModel._
 
 object Responses extends Controller {
@@ -14,8 +13,6 @@ object Responses extends Controller {
     val items: Option[List[ResponseRecord]] = getResponses
     Ok(views.html.responses(items))
   }
-
-
 
   /**
    *  Test script:
@@ -33,12 +30,13 @@ object Responses extends Controller {
    */
   def post = Action(BodyParsers.parse.json) {request =>
 
-    val u_id: String = request.headers.get("u_id") match {
+    val u_id: String = request.session.get("u_id") match {
       case Some(x) => x
       case _ => getUidForIp(request.remoteAddress)
     }
 
-    if (actionCounter(request.remoteAddress, "postResponse") > 5) {
+    val credits: Int = 5 - actionCounter(request.remoteAddress, "postResponse")
+    if (credits <= 0) {
       TooManyRequest("Too many requests")
     } else {
       val result = request.body.validate[Responses]
@@ -48,15 +46,19 @@ object Responses extends Controller {
             Json.obj(
               "status"  -> "KO"
               ,"message" -> JsError.toFlatJson(errors))
-          )
+          ).withHeaders(("X-RateLimit-Credits",credits.toString))
         ,responses => {
-          saveResponses(responses, u_id)
-          Ok(
-            Json.obj(
-              "status"  -> "OK"
-              ,"message" -> ("Responses for s_id " + responses.s_id + " saved.")
-            )
-          )
+            if (isDuplicate(u_id + "_" + responses.s_id)) {
+              Status(420)("Duplicate Request")
+            } else {
+              saveResponses(responses, u_id)
+              Ok(
+                Json.obj(
+                  "status"  -> "OK"
+                  ,"message" -> ("Responses for s_id " + responses.s_id + " saved.")
+                )
+              ).withHeaders(("X-RateLimit-Credits",credits.toString))
+            }
         }
       )
     }

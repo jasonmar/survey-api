@@ -18,4 +18,13 @@ object CacheModel {
     }
   }
 
+  def isDuplicate(id: String): Boolean = {
+    if (Cache.getAs[Int](id).nonEmpty) {
+      true
+    } else {
+      Cache.set(id,1,60)
+      false
+    }
+  }
+
 }

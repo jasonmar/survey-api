@@ -15,13 +15,14 @@ object Surveys extends Controller {
   }
 
   def post = Action {implicit request =>
-      if(actionCounter(request.remoteAddress,"addSurvey") > 5) {
-        TooManyRequest("Too many requests")
-      } else {
-        val survey = surveyForm.bindFromRequest.get
-        insertSurvey(survey)
-        Ok("'" + survey.name + "' inserted")
-      }
+    val credits: Int = 2 - actionCounter(request.remoteAddress, "postResponse")
+    if(credits <= 0) {
+      TooManyRequest("Too many requests")
+    } else {
+      val survey = surveyForm.bindFromRequest.get
+      insertSurvey(survey)
+      Ok("'" + survey.name + "' inserted").withHeaders(("X-RateLimit-Credits",credits.toString))
+    }
   }
 
   def json = Action {

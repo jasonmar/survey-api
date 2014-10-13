@@ -4,6 +4,7 @@
 
 # Home page
 GET     /                       controllers.Application.index
+GET     /form/:id               controllers.Application.responseForm(id: String)
 GET     /login                  controllers.Security.get
 GET     /register               controllers.Security.regform
 

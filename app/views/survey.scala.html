@@ -1,10 +1,10 @@
 @import models.SurveyModel._
 @(form: Form[Survey], orgs: Option[List[SurveyRecord]])
 
-@tr(id: String, s: String) = {
+@tr(s_id: String, name: String) = {
   <tr>
-    <td>@id</td>
-    <td>@s</td>
+    <td><a href="/form/@s_id">@s_id</a></td>
+    <td>@name</td>
   </tr>
 }
 
@@ -22,7 +22,7 @@
     <td>Survey Name</td>
   </tr>
             @for(item <- list) {
-                @tr(item.id, item.name)
+                @tr(item.s_id, item.name)
             }
 </table>
         }
