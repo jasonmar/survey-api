@@ -1,12 +1,13 @@
 @import models.QuestionModel.{Question,QuestionRecord}
 @(form: Form[Question], questions: Option[List[QuestionRecord]])
 
-@tr(s: String, s1: String, s2: String, s3: String) = {
+@tr(q_id: String, s: String, s1: String, s2: String, s3: String) = {
   <tr>
     <td>@s</td>
     <td>@s1</td>
     <td>@s2</td>
     <td>@s3</td>
+    <td><a href="/v1/responses/@q_id">View Responses</a></td>
   </tr>
 }
 
@@ -31,9 +32,10 @@
     <td>Hint 1</td>
     <td>Hint 3</td>
     <td>Hint 5</td>
+    <td>Responses Link</td>
   </tr>
             @for(item <- list) {
-                @tr(item.question.text, item.question.hint1, item.question.hint3, item.question.hint5)
+                @tr(item.q_id, item.question.text, item.question.hint1, item.question.hint3, item.question.hint5)
             }
 </table>
         }
