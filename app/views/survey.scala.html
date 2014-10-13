@@ -1,5 +1,5 @@
 @import models.SurveyModel._
-@(form: Form[Survey], orgs: Option[List[SurveyRecord]])
+@(form: Form[Survey], surveys: Option[List[SurveyRecord]])
 
 @tr(s_id: String, name: String) = {
   <tr>
@@ -11,12 +11,14 @@
 
 @main("Welcome to Play") {
 
+<h2>Create New Survey</h2>
     @helper.form(action = routes.Surveys.post()) {
         @helper.inputText(form("name"),'_label -> "Survey Name")
         <input type="button" onclick="submit" value="Create New Survey" />
     }
 
-    @orgs match {
+<h2>My Surveys</h2>
+    @surveys match {
         case Some(list) => {
 <table>
   <tr>
@@ -34,5 +36,9 @@
         }
     }
 
+<h3>Navigation</h3>
+<div id="nav">
+    <a href="/questions">Create New Question</a>
+</div>
 
 }
