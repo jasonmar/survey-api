@@ -1,11 +1,12 @@
 package controllers
 
+import models.QuestionModel
 import play.api._
 import play.api.libs.json.{JsError, Json}
 import play.api.mvc._
 import models.SurveyModel._
 import models.SurveyUpdateModel.{SurveyQuestions,addSurveyQuestions}
-import models.CacheModel.actionCounter
+import models.CacheModel._
 
 object Surveys extends Controller {
 
@@ -14,14 +15,24 @@ object Surveys extends Controller {
     Ok(views.html.survey(surveyForm, items))
   }
 
+  def editSurvey(s_id: String) = Action {
+    val questions = QuestionModel.getQuestionsBySurveyID(s_id)
+    val allQuestions = QuestionModel.getQuestions
+    Ok(views.html.surveyedit(s_id,questions,allQuestions))
+  }
+
   def post = Action {implicit request =>
     val credits: Int = 2 - actionCounter(request.remoteAddress, "postResponse")
     if(credits <= 0) {
       TooManyRequest("Too many requests")
     } else {
       val survey = surveyForm.bindFromRequest.get
-      insertSurvey(survey)
-      Ok("'" + survey.name + "' inserted").withHeaders(("X-RateLimit-Credits",credits.toString))
+      if (isDuplicate(survey.name.toString)) {
+        Status(420)("Duplicate Request")
+      } else {
+        insertSurvey(survey)
+        Ok("'" + survey.name + "' inserted").withHeaders(("X-RateLimit-Credits",credits.toString))
+      }
     }
   }
 
@@ -66,13 +77,18 @@ object Surveys extends Controller {
             ,"message" -> JsError.toFlatJson(errors))
         )
       ,surveyQuestions => {
-        addSurveyQuestions(surveyQuestions)
-        Ok(
-          Json.obj(
-            "status"  -> "OK"
-            ,"message" -> (surveyQuestions.q_ids.length.toString + " questions for s_id " + surveyQuestions.s_id + " added.")
+        if (isDuplicate(id + "_" + surveyQuestions.hashCode().toString)) {
+          Status(420)("Duplicate Request")
+        } else {
+          addSurveyQuestions(surveyQuestions)
+          Ok(
+            Json.obj(
+              "status"  -> "OK"
+              ,"message" -> (surveyQuestions.q_ids.length.toString + " questions for s_id " + surveyQuestions.s_id + " added.")
+            )
           )
-        )
+        }
+
       }
     )
   }

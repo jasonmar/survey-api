@@ -61,9 +61,21 @@ object ResponseModel {
     }
   }
 
-  def getResponses = {
+  def getResponses: Option[List[ResponseRecord]] = {
     val list: List[ResponseRecord] = DB.withConnection{implicit connection =>
       SQL("""SELECT TOP 5000 S_ID, Q_ID, U_ID, RESPONSE, TIMESTAMP FROM RESPONSES;""").as(rowParser *)
+    }
+    list match {
+      case x if x.nonEmpty => Some(x)
+      case _ => None
+    }
+  }
+
+  def getResponsesById(q_id: String) = {
+    val list: List[ResponseRecord] = DB.withConnection{implicit connection =>
+      SQL("""SELECT TOP 5000 S_ID, Q_ID, U_ID, RESPONSE, TIMESTAMP FROM RESPONSES WHERE Q_ID = {q_id};""")
+        .on("q_id" -> q_id)
+        .as(rowParser *)
     }
     list match {
       case x if x.nonEmpty => Some(x)

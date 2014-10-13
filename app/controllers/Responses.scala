@@ -1,5 +1,6 @@
 package controllers
 
+import models.ResponseModel
 import play.api._
 import play.api.mvc._
 import play.api.libs.json._
@@ -10,8 +11,16 @@ import models.UserModel._
 object Responses extends Controller {
 
   def get = Action {
-    val items: Option[List[ResponseRecord]] = getResponses
+    val items: Option[List[ResponseRecord]] = ResponseModel.getResponses
     Ok(views.html.responses(items))
+  }
+
+  def getResponses(q_id: String) = Action {
+    val items: Option[List[ResponseRecord]] = ResponseModel.getResponsesById(q_id)
+    items match {
+      case Some(list) => Ok(Json.toJson(list).toString())
+      case _ => Ok
+    }
   }
 
   /**
@@ -65,7 +74,7 @@ object Responses extends Controller {
   }
 
   def json = Action {
-    val data: Option[List[ResponseRecord]] = getResponses
+    val data: Option[List[ResponseRecord]] = ResponseModel.getResponses
     data match {
       case Some(list) => Ok(Json.toJson(list).toString())
       case _ => Ok

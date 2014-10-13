@@ -1,9 +1,8 @@
 @import models.QuestionModel.{Question,QuestionRecord}
 @(form: Form[Question], questions: Option[List[QuestionRecord]])
 
-@tr(id: String, s: String, s1: String, s2: String, s3: String) = {
+@tr(s: String, s1: String, s2: String, s3: String) = {
   <tr>
-    <td>@id</td>
     <td>@s</td>
     <td>@s1</td>
     <td>@s2</td>
@@ -13,27 +12,28 @@
 
 @main("Welcome to Play") {
 
+<h2>Create New Question</h2>
     @helper.form(action = routes.Questions.post()) {
         @helper.inputText(form("text"),'_label -> "Question Text")
         @helper.inputText(form("hint1"),'_label -> "Hint 1")
         @helper.inputText(form("hint3"),'_label -> "Hint 3")
         @helper.inputText(form("hint5"),'_label -> "Hint 5")
-        <input type="submit">Submit Question</input>
+        <input type="button" onclick="submit" value="Create Question" />
     }
 
 
     @questions match {
         case Some(list) => {
+<h2>Currently Defined Questions</h2>
 <table>
   <tr>
-    <td>Question ID</td>
     <td>Question Text</td>
     <td>Hint 1</td>
     <td>Hint 3</td>
     <td>Hint 5</td>
   </tr>
             @for(item <- list) {
-                @tr(item.q_id,item.question.text,item.question.hint1,item.question.hint3,item.question.hint5)
+                @tr(item.question.text, item.question.hint1, item.question.hint3, item.question.hint5)
             }
 </table>
         }
@@ -42,5 +42,9 @@
         }
     }
 
+<h3>Navigation</h3>
+<div id="nav">
+    <a href="/surveys">Add Questions to Survey</a>
+</div>
 
 }

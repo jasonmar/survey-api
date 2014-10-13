@@ -3,8 +3,9 @@
 
 @tr(s_id: String, name: String) = {
   <tr>
-    <td><a href="/form/@s_id">@s_id</a></td>
     <td>@name</td>
+    <td><a href="/surveys/@s_id">Edit This Survey</a></td>
+    <td><a href="/form/@s_id">Go To Survey Form</a></td>
   </tr>
 }
 
@@ -12,14 +13,16 @@
 
     @helper.form(action = routes.Surveys.post()) {
         @helper.inputText(form("name"),'_label -> "Survey Name")
+        <input type="button" onclick="submit" value="Create New Survey" />
     }
 
     @orgs match {
         case Some(list) => {
 <table>
   <tr>
-    <td>Survey ID</td>
     <td>Survey Name</td>
+    <td>Edit Link</td>
+    <td>Link to Form</td>
   </tr>
             @for(item <- list) {
                 @tr(item.s_id, item.name)

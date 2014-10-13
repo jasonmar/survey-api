@@ -22,7 +22,7 @@ object CacheModel {
     if (Cache.getAs[Int](id).nonEmpty) {
       true
     } else {
-      Cache.set(id,1,60)
+      Cache.set(id,1,3600)
       false
     }
   }
