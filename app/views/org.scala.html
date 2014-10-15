@@ -9,6 +9,7 @@
 
     @helper.form(action = routes.Orgs.post()) {
         @helper.inputText(form("name"),'_label -> "Org Name")
+	<input type="submit" value="Create Question" />
     }
 
     @orgs match {
@@ -25,5 +26,13 @@
         }
     }
 
+<h3>Navigation</h3>
+<div id="nav">
+    <a href="/surveys">Surveys</a><br />
+    <a href="/questions">Questions</a><br />
+    <a href="/responses">Responses</a><br />
+    <a href="/login">Login</a><br />
+    <a href="/register">Register</a>
+</div>
 
 }

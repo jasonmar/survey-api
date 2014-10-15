@@ -19,7 +19,7 @@
         @helper.inputText(form("hint1"),'_label -> "Hint 1")
         @helper.inputText(form("hint3"),'_label -> "Hint 3")
         @helper.inputText(form("hint5"),'_label -> "Hint 5")
-        <input type="button" onclick="submit" value="Create Question" />
+        <input type="submit" value="Create Question" />
     }
 
 
@@ -46,7 +46,12 @@
 
 <h3>Navigation</h3>
 <div id="nav">
-    <a href="/surveys">Create New Survey</a>
+    <a href="/surveys">Surveys</a><br />
+    <a href="/">Home</a><br />
+    <a href="/responses">Responses</a><br />
+    <a href="/orgs">Organizations</a><br />
+    <a href="/login">Login</a><br />
+    <a href="/register">Register</a><br />
 </div>
 
 }
