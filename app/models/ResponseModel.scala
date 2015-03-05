@@ -4,7 +4,8 @@ import anorm.SqlParser._
 import anorm._
 import play.api.db.DB
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{Json, Writes, JsPath, Reads}
+import play.api.libs.json._
+import play.api.libs.json.Reads._
 import play.api.Play.current
 import org.joda.time._
 import models.AnormExtension._
@@ -21,7 +22,7 @@ object ResponseModel {
 
   case class Responses(
      s_id: String
-    ,o_id: Option[String]
+    ,o_id: String
     ,responses: List[Response]
   ) {
     require(responses.nonEmpty)
@@ -42,16 +43,16 @@ object ResponseModel {
   )(Response.apply _)
 
   implicit val responsesReads: Reads[Responses] = (
-    (JsPath \ "s_id").read[String] and
-    (JsPath \ "o_id").read[Option[String]] and
-    (JsPath \ "responses").read[List[Response]]
+    (__ \ "s_id").read[String] and
+    (__ \ "o_id").read[String] and
+    (__ \ "responses").read[List[Response]]
   )(Responses.apply _)
 
   implicit val responseWrites = new Writes[ResponseRecord] {
     def writes(x: ResponseRecord) = Json.obj(
       "surveyId"    -> x.s_id
       ,"questionId" -> x.q_id
-      ,"orgId"      -> x.o_id.getOrElse("")
+      ,"orgId"      -> x.o_id
       ,"response"   -> x.response
       ,"timestamp"  -> d2s(x.timestamp)
     )
@@ -66,7 +67,7 @@ object ResponseModel {
           .on("S_ID"     -> r.s_id)
           .on("Q_ID"     -> response.q_id)
           .on("U_ID"     -> u_id)
-          .on("O_ID"     -> r.o_id.getOrElse(""))
+          .on("O_ID"     -> r.o_id)
           .on("RESPONSE" -> response.response)
           .executeInsert()
       }
@@ -98,6 +99,18 @@ object ResponseModel {
     val list: List[ResponseRecord] = DB.withConnection{implicit connection =>
       SQL("""SELECT TOP 5000 S_ID, Q_ID, U_ID, O_ID, RESPONSE, TIMESTAMP FROM RESPONSES WHERE Q_ID = {q_id};""")
         .on("q_id" -> q_id)
+        .as(rowParser *)
+    }
+    list match {
+      case x if x.nonEmpty => Some(x)
+      case _ => None
+    }
+  }
+
+  def getResponsesByOrgId(o_id: String) = {
+    val list: List[ResponseRecord] = DB.withConnection{implicit connection =>
+      SQL("""SELECT TOP 5000 S_ID, Q_ID, U_ID, O_ID, RESPONSE, TIMESTAMP FROM RESPONSES WHERE O_ID = {o_id};""")
+        .on("o_id" -> o_id)
         .as(rowParser *)
     }
     list match {

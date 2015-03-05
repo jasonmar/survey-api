@@ -9,6 +9,7 @@
 
     @helper.form(action = routes.Orgs.post()) {
         @helper.inputText(form("name"),'_label -> "Org Name")
+        <input type="submit" value="Add Organization" />
     }
 
     @orgs match {

@@ -39,7 +39,7 @@ function createForm(surveyObject,divName){
     var y = document.createElement("input");
     y.setAttribute('type',"hidden");
     y.setAttribute('name',"o_id");
-    y.setAttribute('value',"");
+    y.setAttribute('value',"1");
     f.appendChild(y);
 
     for(var i = 0; i < surveyObject.questions.length; i++) {
@@ -82,7 +82,7 @@ function createForm(surveyObject,divName){
             var col = document.createElement('td');
             var label = document.createElement('label');
             var lspan = document.createElement('span');
-            lspan.setAttribute('label-body');
+            lspan.setAttribute('class','label-body');
             var input = document.createElement('input');
             input.setAttribute('type','radio');
             input.setAttribute('name',q.q_id);
@@ -119,6 +119,7 @@ function toJSON(formId){
 
   var survey = document.getElementById('survey');
   var s_id = survey.elements['s_id'].value;
+  var o_id = survey.elements['o_id'].value;
 
   var inputs = survey.getElementsByTagName('input');
   var responses = [];
@@ -129,7 +130,7 @@ function toJSON(formId){
   }
 
   var response = [];
-  response.push({s_id: s_id, responses: responses});
+  response.push({s_id: s_id, o_id: o_id, responses: responses});
   var json = JSON.stringify(response[0]);
   return json;
 }

@@ -23,6 +23,14 @@ object Responses extends Controller {
     }
   }
 
+  def getResponsesByOrgId(o_id: String) = Action {
+    val items: Option[List[ResponseRecord]] = ResponseModel.getResponsesByOrgId(o_id)
+    items match {
+      case Some(list) => Ok(Json.toJson(list).toString())
+      case _ => Ok
+    }
+  }
+
   /**
    *  Test script:
    *  curl --include --request POST --header "Content-type: application/json" \

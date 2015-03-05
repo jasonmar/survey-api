@@ -14,7 +14,7 @@
 <h2>Create New Survey</h2>
     @helper.form(action = routes.Surveys.post()) {
         @helper.inputText(form("name"),'_label -> "Survey Name")
-        <input type="button" onclick="submit" value="Create New Survey" />
+        <input type="submit" value="Create New Survey" />
     }
 
 <h2>My Surveys</h2>
