@@ -30,11 +30,17 @@ function createForm(surveyObject,divName){
     f.setAttribute('action',"/v1/responses");
     f.setAttribute('id',"survey");
 
-    var i = document.createElement("input");
-    i.setAttribute('type',"hidden");
-    i.setAttribute('name',"s_id");
-    i.setAttribute('value',surveyObject.s_id);
-    f.appendChild(i);
+    var x = document.createElement("input");
+    x.setAttribute('type',"hidden");
+    x.setAttribute('name',"s_id");
+    x.setAttribute('value',surveyObject.s_id);
+    f.appendChild(x);
+
+    var y = document.createElement("input");
+    y.setAttribute('type',"hidden");
+    y.setAttribute('name',"o_id");
+    y.setAttribute('value',"");
+    f.appendChild(y);
 
     for(var i = 0; i < surveyObject.questions.length; i++) {
         var q = surveyObject.questions[i];
@@ -74,11 +80,16 @@ function createForm(surveyObject,divName){
 
         for(var j = 1; j <= 5; j++) {
             var col = document.createElement('td');
+            var label = document.createElement('label');
+            var lspan = document.createElement('span');
+            lspan.setAttribute('label-body');
             var input = document.createElement('input');
             input.setAttribute('type','radio');
             input.setAttribute('name',q.q_id);
             input.setAttribute('value',j);
-            col.appendChild(input);
+            lspan.appendChild(input);
+            label.appendChild(lspan);
+            col.appendChild(label);
             row3.appendChild(col);
         }
 
@@ -89,6 +100,7 @@ function createForm(surveyObject,divName){
     }
 
     var s = document.createElement("input");
+    s.setAttribute('class', "button-primary");
     s.setAttribute('type', "button");
     s.setAttribute('onclick',"submitJSON('surveyForm', '/v1/responses', cb);");
     s.setAttribute('value', "Submit Responses");
@@ -139,10 +151,8 @@ function submitJSON(formId,url,callback){
 }
 
 </script>
-<style>
-    table,tr,td{border:0px;border-spacing:0;margin:0;padding:0;}
-    td{min-width:60px;text-align:center;vertical-align:top;}
-</style>
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("normalize.css")">
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("skeleton.css")">
 </head>
 <body onload="getSurveyJSON('@s_id');">
 <div id="surveyForm"></div>
