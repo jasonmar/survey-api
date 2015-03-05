@@ -1,4 +1,4 @@
-@(s_id: String)
+@(s_id: String, o_id: String)
 
 <!DOCTYPE html>
 <html>
@@ -7,13 +7,13 @@
     <title></title>
     <script>
 
-function getSurveyJSON(s_id){
+function getSurveyJSON(s_id,o_id){
   var xmlhttp = new XMLHttpRequest();
   var url = '/v1/surveys/' + s_id;
   xmlhttp.onreadystatechange = function() {
     if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
         var json = JSON.parse(xmlhttp.responseText);
-        createForm(json,'surveyForm');
+        createForm(json,o_id,'surveyForm');
     }
   }
   xmlhttp.open("GET", url, true);
@@ -24,7 +24,7 @@ function cb(string) {
   document.getElementById('msg').innerHTML = string;
 }
 
-function createForm(surveyObject,divName){
+function createForm(surveyObject,o_id,divName){
     var f = document.createElement("form");
     f.setAttribute('method',"post");
     f.setAttribute('action',"/v1/responses");
@@ -39,7 +39,7 @@ function createForm(surveyObject,divName){
     var y = document.createElement("input");
     y.setAttribute('type',"hidden");
     y.setAttribute('name',"o_id");
-    y.setAttribute('value',"1");
+    y.setAttribute('value',o_id);
     f.appendChild(y);
 
     for(var i = 0; i < surveyObject.questions.length; i++) {
@@ -155,7 +155,7 @@ function submitJSON(formId,url,callback){
     <link rel="stylesheet" media="screen" href="@routes.Assets.at("normalize.css")">
     <link rel="stylesheet" media="screen" href="@routes.Assets.at("skeleton.css")">
 </head>
-<body onload="getSurveyJSON('@s_id');">
+<body onload="getSurveyJSON('@s_id','@o_id');">
 <div id="surveyForm"></div>
 <div id="output"></div>
 <div id="msg"></div>
