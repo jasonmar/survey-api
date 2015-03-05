@@ -16,3 +16,4 @@ dist
 .jar
 .bat
 *.lock
+*.log

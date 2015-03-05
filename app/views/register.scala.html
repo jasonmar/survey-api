@@ -7,7 +7,18 @@
     @helper.form(action = routes.Security.register()) {
         @helper.inputText(form("userId"),'_label -> "userId")
         @helper.inputText(form("password"),'_label -> "password")
-        <input type="submit">Register</input>
+        <input type="submit" value="Register" />
     }
+
+<h3>Navigation</h3>
+<div id="nav">
+    <a href="/surveys">Surveys</a><br />
+    <a href="/questions">Questions</a><br />
+    <a href="/responses">Responses</a><br />
+    <a href="/orgs">Organizations</a><br />
+    <a href="/login">Login</a><br />
+    <a href="/register">Register</a>
+</div>
+
 
 }
