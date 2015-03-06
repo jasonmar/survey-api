@@ -9,7 +9,7 @@ GET     /login                    controllers.Security.get
 GET     /register                 controllers.Security.regform
 
 GET     /surveys                  controllers.Surveys.get
-GET     /surveys/s_id             controllers.Surveys.editSurvey(s_id: String)
+GET     /surveys/:s_id             controllers.Surveys.editSurvey(s_id: String)
 
 GET     /orgs                     controllers.Orgs.get
 GET     /orgs/:o_id               controllers.Application.responseFormWithOrgId(o_id: String)
