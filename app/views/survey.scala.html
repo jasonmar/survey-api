@@ -1,5 +1,5 @@
 @import models.SurveyModel._
-@(form: Form[Survey], surveys: Option[List[SurveyRecord]])
+@(form: Form[Survey], surveys: Option[List[SurveyRecord]])(implicit messages: Messages)
 
 @tr(s_id: String, name: String) = {
   <tr>

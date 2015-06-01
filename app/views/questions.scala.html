@@ -1,5 +1,5 @@
 @import models.QuestionModel.{Question,QuestionRecord}
-@(form: Form[Question], questions: Option[List[QuestionRecord]])
+@(form: Form[Question], questions: Option[List[QuestionRecord]])(implicit messages: Messages)
 
 @tr(q_id: String, s: String, s1: String, s2: String, s3: String) = {
   <tr>

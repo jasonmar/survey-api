@@ -1,5 +1,5 @@
 @import models.OrgModel.Org
-@(form: Form[Org], orgs: Option[List[Org]])
+@(form: Form[Org], orgs: Option[List[Org]])(implicit messages: Messages)
 
 @tr(s: String) = {
   <tr><td>@s</td></tr>

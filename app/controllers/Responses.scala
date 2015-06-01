@@ -7,6 +7,8 @@ import play.api.libs.json._
 import models.ResponseModel._
 import models.CacheModel._
 import models.UserModel._
+import play.api.i18n.Messages.Implicits._
+import play.api.Play.current
 
 object Responses extends Controller {
 

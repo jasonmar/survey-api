@@ -4,6 +4,8 @@ import models.QuestionModel._
 import play.api._
 import play.api.libs.json.Json
 import play.api.mvc._
+import play.api.i18n.Messages.Implicits._
+import play.api.Play.current
 
 object Questions extends Controller {
 

@@ -7,6 +7,8 @@ import play.api.mvc._
 import models.SurveyModel._
 import models.SurveyUpdateModel.{SurveyQuestions,addSurveyQuestions}
 import models.CacheModel._
+import play.api.i18n.Messages.Implicits._
+import play.api.Play.current
 
 object Surveys extends Controller {
 

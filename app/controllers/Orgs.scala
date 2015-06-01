@@ -4,6 +4,8 @@ import play.api._
 import play.api.mvc._
 import play.api.libs.json._
 import models.OrgModel._
+import play.api.i18n.Messages.Implicits._
+import play.api.Play.current
 
 object Orgs extends Controller {
 
